@@ -1,7 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useWindowManager, type OpenWindowConfig } from '../context/WindowManager'
 import Window from './Window'
 import Taskbar from './Taskbar'
+import DesktopIcon from './DesktopIcon'
+import AboutMe from '../apps/AboutMe'
+import MyComputer from '../apps/MyComputer'
+import RecycleBin from '../apps/RecycleBin'
 import type { StartMenuItem } from './StartMenu'
 
 const welcomeWindow: OpenWindowConfig = {
@@ -18,8 +22,58 @@ const welcomeWindow: OpenWindowConfig = {
   ),
 }
 
+interface DesktopIconConfig {
+  id: string
+  label: string
+  icon: string
+  window: OpenWindowConfig
+}
+
+const desktopIcons: DesktopIconConfig[] = [
+  {
+    id: 'my-computer',
+    label: 'My Computer',
+    icon: '/assets/my-computer-icon.png',
+    window: {
+      id: 'my-computer',
+      title: 'My Computer',
+      icon: '/assets/my-computer-icon.png',
+      position: { x: 180, y: 90 },
+      width: 360,
+      content: <MyComputer />,
+    },
+  },
+  {
+    id: 'about',
+    label: 'About Me',
+    icon: '/assets/about-icon.png',
+    window: {
+      id: 'about',
+      title: 'About Me',
+      icon: '/assets/about-icon.png',
+      position: { x: 130, y: 130 },
+      width: 440,
+      content: <AboutMe />,
+    },
+  },
+  {
+    id: 'recycle-bin',
+    label: 'Recycle Bin',
+    icon: '/assets/recycle-bin-icon.png',
+    window: {
+      id: 'recycle-bin',
+      title: 'Recycle Bin',
+      icon: '/assets/recycle-bin-icon.png',
+      position: { x: 230, y: 170 },
+      width: 360,
+      content: <RecycleBin />,
+    },
+  },
+]
+
 export default function Desktop({ onShutDown }: { onShutDown: () => void }) {
   const { windows, openWindow } = useWindowManager()
+  const [selectedIcon, setSelectedIcon] = useState<string | null>(null)
 
   useEffect(() => {
     openWindow(welcomeWindow)
@@ -41,12 +95,26 @@ export default function Desktop({ onShutDown }: { onShutDown: () => void }) {
   ]
 
   return (
-    <div className="desktop">
+    <div className="desktop" onClick={() => setSelectedIcon(null)}>
+      <div className="desktop-icons">
+        {desktopIcons.map((entry) => (
+          <DesktopIcon
+            key={entry.id}
+            label={entry.label}
+            icon={entry.icon}
+            selected={selectedIcon === entry.id}
+            onSelect={() => setSelectedIcon(entry.id)}
+            onOpen={() => openWindow(entry.window)}
+          />
+        ))}
+      </div>
+
       {windows
         .filter((w) => !w.isMinimized)
         .map((w) => (
           <Window key={w.id} win={w} />
         ))}
+
       <Taskbar startMenuItems={startMenuItems} />
     </div>
   )
