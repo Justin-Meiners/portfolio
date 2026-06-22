@@ -1,7 +1,8 @@
 import { useWindowManager, type WindowState } from '../context/WindowManager'
+import ImageSlot from './ImageSlot'
 
 export default function Window({ win }: { win: WindowState }) {
-  const { activeId, focusWindow, closeWindow } = useWindowManager()
+  const { activeId, focusWindow, closeWindow, minimizeWindow } = useWindowManager()
   const isActive = activeId === win.id
 
   return (
@@ -17,9 +18,18 @@ export default function Window({ win }: { win: WindowState }) {
       }}
     >
       <div className={`title-bar${isActive ? '' : ' inactive'}`}>
-        <div className="title-bar-text">{win.title}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {win.icon && <ImageSlot src={win.icon} alt="" width={16} height={16} />}
+          <span className="title-bar-text">{win.title}</span>
+        </div>
         <div className="title-bar-controls">
-          <button aria-label="Minimize" disabled />
+          <button
+            aria-label="Minimize"
+            onClick={(e) => {
+              e.stopPropagation()
+              minimizeWindow(win.id)
+            }}
+          />
           <button aria-label="Maximize" disabled />
           <button
             aria-label="Close"
