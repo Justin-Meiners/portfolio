@@ -3,23 +3,15 @@ import { useWindowManager, type OpenWindowConfig } from '../context/WindowManage
 import Window from './Window'
 import Taskbar from './Taskbar'
 import DesktopIcon from './DesktopIcon'
-import AboutMe from '../apps/AboutMe'
-import MyComputer from '../apps/MyComputer'
-import RecycleBin from '../apps/RecycleBin'
 import type { StartMenuItem } from './StartMenu'
 
 const welcomeWindow: OpenWindowConfig = {
   id: 'welcome',
   title: 'Welcome',
   icon: '/assets/welcome-icon.png',
+  appId: 'welcome',
   position: { x: 96, y: 72 },
   width: 360,
-  content: (
-    <div>
-      <p style={{ marginTop: 0 }}>Welcome to my portfolio.</p>
-      <p style={{ marginBottom: 0 }}>Take a look around.</p>
-    </div>
-  ),
 }
 
 interface DesktopIconConfig {
@@ -38,9 +30,9 @@ const desktopIcons: DesktopIconConfig[] = [
       id: 'my-computer',
       title: 'My Computer',
       icon: '/assets/my-computer-icon.png',
+      appId: 'my-computer',
       position: { x: 180, y: 90 },
       width: 360,
-      content: <MyComputer />,
     },
   },
   {
@@ -51,9 +43,9 @@ const desktopIcons: DesktopIconConfig[] = [
       id: 'about',
       title: 'About Me',
       icon: '/assets/about-icon.png',
+      appId: 'about',
       position: { x: 130, y: 130 },
       width: 440,
-      content: <AboutMe />,
     },
   },
   {
@@ -64,9 +56,9 @@ const desktopIcons: DesktopIconConfig[] = [
       id: 'recycle-bin',
       title: 'Recycle Bin',
       icon: '/assets/recycle-bin-icon.png',
+      appId: 'recycle-bin',
       position: { x: 230, y: 170 },
       width: 360,
-      content: <RecycleBin />,
     },
   },
 ]

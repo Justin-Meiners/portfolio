@@ -7,11 +7,12 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import type { AppId } from '../apps/registry'
 
 export interface WindowState {
   id: string
   title: string
-  content: ReactNode
+  appId: AppId
   icon?: string
   position: { x: number; y: number }
   width?: number
@@ -22,7 +23,7 @@ export interface WindowState {
 export interface OpenWindowConfig {
   id: string
   title: string
-  content: ReactNode
+  appId: AppId
   icon?: string
   position?: { x: number; y: number }
   width?: number
@@ -75,7 +76,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
         {
           id: config.id,
           title: config.title,
-          content: config.content,
+          appId: config.appId,
           icon: config.icon,
           position: config.position ?? { x: 80, y: 80 },
           width: config.width,
