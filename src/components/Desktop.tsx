@@ -49,6 +49,19 @@ const desktopIcons: DesktopIconConfig[] = [
     },
   },
   {
+    id: 'projects',
+    label: 'Projects',
+    icon: '/assets/project-folder.png',
+    window: {
+      id: 'projects',
+      title: 'Projects',
+      icon: '/assets/project-folder.png',
+      appId: 'projects',
+      position: { x: 150, y: 100 },
+      width: 420,
+    },
+  },
+  {
     id: 'recycle-bin',
     label: 'Recycle Bin',
     icon: '/assets/recycle-bin-icon.png',

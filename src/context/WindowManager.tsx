@@ -7,12 +7,13 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { AppId } from '../apps/registry'
+import type { AppId, AppParams } from '../apps/registry'
 
 export interface WindowState {
   id: string
   title: string
   appId: AppId
+  params?: AppParams
   icon?: string
   position: { x: number; y: number }
   width?: number
@@ -24,6 +25,7 @@ export interface OpenWindowConfig {
   id: string
   title: string
   appId: AppId
+  params?: AppParams
   icon?: string
   position?: { x: number; y: number }
   width?: number
@@ -77,6 +79,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
           id: config.id,
           title: config.title,
           appId: config.appId,
+          params: config.params,
           icon: config.icon,
           position: config.position ?? { x: 80, y: 80 },
           width: config.width,
@@ -118,6 +121,8 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     },
     [windows, activeId, minimizeWindow, focusWindow],
   )
+
+  
 
   const value = useMemo(
     () => ({

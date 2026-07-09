@@ -1,12 +1,12 @@
 import type { ComponentType } from 'react'
 import { useWindowManager, type WindowState } from '../context/WindowManager'
-import { APP_REGISTRY } from '../apps/registry'
+import { APP_REGISTRY, type AppParams } from '../apps/registry'
 import ImageSlot from './ImageSlot'
 
 export default function Window({ win }: { win: WindowState }) {
   const { activeId, focusWindow, closeWindow, minimizeWindow } = useWindowManager()
   const isActive = activeId === win.id
-  const Body: ComponentType = APP_REGISTRY[win.appId]
+  const Body: ComponentType<AppParams> = APP_REGISTRY[win.appId]
 
   return (
     <div
@@ -44,7 +44,7 @@ export default function Window({ win }: { win: WindowState }) {
         </div>
       </div>
       <div className="window-body">
-        <Body />
+        <Body {...win.params} />
       </div>
     </div>
   )

@@ -18,7 +18,7 @@ export default function StartMenu({ items, onClose }: StartMenuProps) {
       <div className="start-menu-backdrop" onClick={onClose} />
       <div className="start-menu">
         <div className="start-menu-banner">
-          <span>Portfolio</span>
+          <span>Justin M</span>
         </div>
         <ul className="start-menu-items">
           {items.map((item) => (
