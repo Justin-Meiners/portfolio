@@ -147,10 +147,17 @@ body {
 
 .desktop-icon.selected .desktop-icon-label {
   background: #000080;
+  color: #fff;
   outline: 1px dotted #fff;
 }
 
 .about-me {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about-me-summary {
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -159,6 +166,37 @@ body {
 .about-me-text {
   flex: 1;
   min-width: 0;
+}
+
+.skills-section h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.skill-group {
+  min-width: 0;
+  margin: 0;
+}
+
+.skill-group ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-group li {
+  padding: 3px 6px;
+  background: #fff;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px grey;
 }
 
 .explorer {
