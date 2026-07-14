@@ -39,6 +39,7 @@ interface WindowManagerContextValue {
   focusWindow: (id: string) => void
   minimizeWindow: (id: string) => void
   toggleWindow: (id: string) => void
+  moveWindow: (id: string, position: { x: number; y: number }) => void
 }
 
 const WindowManagerContext = createContext<WindowManagerContextValue | null>(null)
@@ -99,6 +100,15 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     [windows],
   )
 
+  const moveWindow = useCallback(
+    (id: string, position: { x: number; y: number }) => {
+      setWindows((prev) =>
+        prev.map((w) => (w.id === id ? { ...w, position } : w)),
+      )
+    },
+    [],
+  )
+
   const minimizeWindow = useCallback(
     (id: string) => {
       setWindows((prev) =>
@@ -133,6 +143,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       focusWindow,
       minimizeWindow,
       toggleWindow,
+      moveWindow,
     }),
     [
       windows,
@@ -142,6 +153,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       focusWindow,
       minimizeWindow,
       toggleWindow,
+      moveWindow,
     ],
   )
 
@@ -152,7 +164,6 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useWindowManager() {
   const ctx = useContext(WindowManagerContext)
   if (!ctx) {
