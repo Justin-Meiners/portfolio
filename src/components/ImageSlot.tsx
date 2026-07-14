@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { assetUrl } from '../asset'
 
 interface ImageSlotProps {
   src: string
@@ -22,7 +23,7 @@ export default function ImageSlot({ src, alt, width, height }: ImageSlotProps) {
 
   return (
     <img
-      src={src}
+      src={assetUrl(src)}
       alt={alt}
       width={width}
       height={height}

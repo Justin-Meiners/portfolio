@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { assetUrl } from '../asset'
 
 export default function ShutDownScreen({ onRestart }: { onRestart: () => void }) {
   const [showPrompt, setShowPrompt] = useState(false)
@@ -10,7 +11,7 @@ export default function ShutDownScreen({ onRestart }: { onRestart: () => void })
 
   return (
     <div className="fullscreen-splash">
-      <img src="/assets/shutdown-screen.png" alt="It's now safe to turn off your computer" />
+      <img src={assetUrl('/assets/shutdown-screen.png')} alt="It's now safe to turn off your computer" />
       {showPrompt && (
         <div className="window restart-dialog">
           <div className="title-bar">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { assetUrl } from '../asset'
 
 export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [username, setUsername] = useState('Justin')
@@ -19,7 +20,7 @@ export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
           >
             <img
               className="login-key"
-              src="/assets/key_win_alt-2.png"
+              src={assetUrl('/assets/key_win_alt-2.png')}
               alt=""
               width={48}
               height={48}
