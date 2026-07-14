@@ -17,7 +17,7 @@ export const projects: Project[] = [
       'Critterpedia. After tediously searching for what critters are currently available and' +
       ' trying to track them, I decided to build this as a way to help keep track of the creatures you\'ve collected.' +
       ' While more features are on the way, the current build allows for filtering for critters available at this exact moment' +
-      ' and provides a simple way to log in a view your progress.',
+      ' and provides a simple way to log in to view your progress.',
     tech: ['React', 'TypeScript', 'AWS', 'DynamoDB', 'Amplify'],
     icon: '/assets/acnh-icon.png',
     screenshot: '/assets/acnh-screenshot.png',

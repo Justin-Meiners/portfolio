@@ -1,6 +1,7 @@
 import { useRef, useState, type ComponentType, type PointerEvent } from 'react'
 import { useWindowManager, type WindowState } from '../context/WindowManager'
 import { APP_REGISTRY, type AppParams } from '../apps/registry'
+import { DESKTOP_ZOOM } from '../desktopZoom'
 import ImageSlot from './ImageSlot'
 
 export default function Window({ win }: { win: WindowState }) {
@@ -33,11 +34,14 @@ export default function Window({ win }: { win: WindowState }) {
     const drag = dragRef.current
     if (!drag) return
     const width = win.width ?? 320
-    const nextX = drag.origin.x + (e.clientX - drag.startX)
-    const nextY = drag.origin.y + (e.clientY - drag.startY)
+    // Pointer deltas are in viewport px; the desktop is zoomed, so scale into desktop px.
+    const nextX = drag.origin.x + (e.clientX - drag.startX) / DESKTOP_ZOOM
+    const nextY = drag.origin.y + (e.clientY - drag.startY) / DESKTOP_ZOOM
     // Prevent window from being dragged out of view
-    const x = Math.min(Math.max(nextX, -(width - 120)), window.innerWidth - 120)
-    const y = Math.min(Math.max(nextY, 0), window.innerHeight - 40)
+    const viewW = window.innerWidth / DESKTOP_ZOOM
+    const viewH = window.innerHeight / DESKTOP_ZOOM
+    const x = Math.min(Math.max(nextX, -(width - 120)), viewW - 120)
+    const y = Math.min(Math.max(nextY, 0), viewH - 40)
     setDragPos({ x, y })
   }
 
