@@ -1,10 +1,11 @@
 import ImageSlot from '../components/ImageSlot'
 
 const skillGroups = [
-  { category: 'Languages', skills: ['Python', 'C'] },
-  { category: 'Frontend', skills: ['React'] },
-  { category: 'Developer Tools', skills: ['Git', 'Docker'] },
-  { category: 'Cloud', skills: ['AWS'] },
+  { category: 'Languages', skills: ['Python', 'C', 'Java', 'JavaScript', 'TypeScript'] },
+  { category: 'Full-Stack', skills: ['React', 'Node.js', 'FastAPI', 'PostgreSQL'] },
+  { category: 'Developer Tools', skills: ['Git', 'Docker', 'AWS'] },
+  { category: 'Databases', skills: ['MongoDB', 'NoSQL', 'Neo4j', 'DynamoDB']}
+  
 ]
 
 export default function AboutMe() {
