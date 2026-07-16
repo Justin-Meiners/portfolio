@@ -6,6 +6,10 @@ body {
   width: 100%;
 }
 
+:root {
+  --taskbar-height: 30px;
+}
+
 body {
   overflow: hidden;
 }
@@ -22,6 +26,18 @@ body {
   inset: 0;
   background-color: #008080;
   overflow: hidden;
+}
+
+.desktop-window.maximized {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-window.maximized > .window-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .image-slot-placeholder {
@@ -197,6 +213,45 @@ body {
   padding: 3px 6px;
   background: #fff;
   box-shadow: inset -1px -1px #fff, inset 1px 1px grey;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --taskbar-height: 36px;
+  }
+
+  .desktop > .desktop-window {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    left: 4px !important;
+    top: 4px !important;
+    width: calc(100% - 8px) !important;
+    height: calc(100% - var(--taskbar-height) - 8px) !important;
+  }
+
+  .desktop > .desktop-window > .window-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .desktop-window .title-bar {
+    min-height: 22px;
+  }
+
+  .desktop-window .title-bar-controls button {
+    min-width: 22px;
+    min-height: 20px;
+  }
+
+  .about-me-summary {
+    flex-direction: column;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .explorer {

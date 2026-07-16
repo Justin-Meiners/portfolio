@@ -19,6 +19,7 @@ export interface WindowState {
   width?: number
   zIndex: number
   isMinimized: boolean
+  isMaximized: boolean
 }
 
 export interface OpenWindowConfig {
@@ -38,6 +39,7 @@ interface WindowManagerContextValue {
   closeWindow: (id: string) => void
   focusWindow: (id: string) => void
   minimizeWindow: (id: string) => void
+  toggleMaximizeWindow: (id: string) => void
   toggleWindow: (id: string) => void
   moveWindow: (id: string, position: { x: number; y: number }) => void
 }
@@ -86,6 +88,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
           width: config.width,
           zIndex: z,
           isMinimized: false,
+          isMaximized: false,
         },
       ]
     })
@@ -119,6 +122,14 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     [windows],
   )
 
+  const toggleMaximizeWindow = useCallback((id: string) => {
+    setWindows((prev) =>
+      prev.map((w) =>
+        w.id === id ? { ...w, isMaximized: !w.isMaximized } : w,
+      ),
+    )
+  }, [])
+
   const toggleWindow = useCallback(
     (id: string) => {
       const win = windows.find((w) => w.id === id)
@@ -132,8 +143,6 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     [windows, activeId, minimizeWindow, focusWindow],
   )
 
-  
-
   const value = useMemo(
     () => ({
       windows,
@@ -142,6 +151,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       closeWindow,
       focusWindow,
       minimizeWindow,
+      toggleMaximizeWindow,
       toggleWindow,
       moveWindow,
     }),
@@ -152,6 +162,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       closeWindow,
       focusWindow,
       minimizeWindow,
+      toggleMaximizeWindow,
       toggleWindow,
       moveWindow,
     ],

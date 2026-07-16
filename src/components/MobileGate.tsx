@@ -1,24 +1,11 @@
-import { useEffect, useState } from 'react'
-
-const MOBILE_MAX_WIDTH = 768
-
-function useIsSmallScreen() {
-  const [isSmall, setIsSmall] = useState(
-    () => window.innerWidth < MOBILE_MAX_WIDTH,
-  )
-  useEffect(() => {
-    const onResize = () => setIsSmall(window.innerWidth < MOBILE_MAX_WIDTH)
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
-  return isSmall
-}
+import { useState } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 export default function MobileGate() {
-  const isSmall = useIsSmallScreen()
+  const isMobile = useIsMobile()
   const [entered, setEntered] = useState(false)
 
-  if (!isSmall || entered) return null
+  if (!isMobile || entered) return null
 
   return (
     <div className="mobile-gate">

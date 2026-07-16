@@ -2,12 +2,20 @@ import { useRef, useState, type ComponentType, type PointerEvent } from 'react'
 import { useWindowManager, type WindowState } from '../context/WindowManager'
 import { APP_REGISTRY, type AppParams } from '../apps/registry'
 import { DESKTOP_ZOOM } from '../desktopZoom'
+import { useIsMobile } from '../hooks/useIsMobile'
 import ImageSlot from './ImageSlot'
 
 export default function Window({ win }: { win: WindowState }) {
-  const { activeId, focusWindow, closeWindow, minimizeWindow, moveWindow } =
-    useWindowManager()
+  const {
+    activeId,
+    focusWindow,
+    closeWindow,
+    minimizeWindow,
+    toggleMaximizeWindow,
+    moveWindow,
+  } = useWindowManager()
   const isActive = activeId === win.id
+  const isMobile = useIsMobile()
   const Body: ComponentType<AppParams> = APP_REGISTRY[win.appId]
 
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null)
@@ -21,6 +29,7 @@ export default function Window({ win }: { win: WindowState }) {
 
   function handlePointerDown(e: PointerEvent) {
     if (e.button !== 0) return
+    if (isMobile || win.isMaximized) return
     if ((e.target as HTMLElement).closest('.title-bar-controls')) return
     dragRef.current = {
       startX: e.clientX,
@@ -57,19 +66,23 @@ export default function Window({ win }: { win: WindowState }) {
 
   return (
     <div
-      className="window"
+      className={`window desktop-window${win.isMaximized ? ' maximized' : ''}`}
       onMouseDown={() => focusWindow(win.id)}
       style={{
         position: 'absolute',
-        left: pos.x,
-        top: pos.y,
+        left: win.isMaximized ? 0 : pos.x,
+        top: win.isMaximized ? 0 : pos.y,
         zIndex: win.zIndex,
-        width: win.width ?? 320,
+        width: win.isMaximized ? '100%' : (win.width ?? 320),
+        height: win.isMaximized ? 'calc(100% - var(--taskbar-height))' : undefined,
       }}
     >
       <div
         className={`title-bar${isActive ? '' : ' inactive'}`}
-        style={{ cursor: 'move', userSelect: 'none' }}
+        style={{
+          cursor: isMobile || win.isMaximized ? 'default' : 'move',
+          userSelect: 'none',
+        }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -86,7 +99,13 @@ export default function Window({ win }: { win: WindowState }) {
               minimizeWindow(win.id)
             }}
           />
-          <button aria-label="Maximize" disabled />
+          <button
+            aria-label={win.isMaximized ? 'Restore' : 'Maximize'}
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleMaximizeWindow(win.id)
+            }}
+          />
           <button
             aria-label="Close"
             onClick={(e) => {

@@ -3,7 +3,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 30px;
+  height: var(--taskbar-height);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -83,7 +84,7 @@
 .start-menu {
   position: fixed;
   left: 3px;
-  bottom: 30px;
+  bottom: var(--taskbar-height);
   z-index: 2;
   display: flex;
   background: #c0c0c0;
@@ -93,6 +94,34 @@
     inset 1px 1px #fff,
     inset -2px -2px grey,
     inset 2px 2px #dfdfdf;
+}
+
+@media (max-width: 768px) {
+  .start-button,
+  .taskbar-button,
+  .taskbar-tray {
+    height: 28px;
+  }
+
+  .taskbar-button {
+    flex: 0 0 110px;
+    width: 110px;
+  }
+
+  .taskbar-tray {
+    padding: 0 5px;
+  }
+
+  .taskbar-windows {
+    overflow-x: auto;
+    overflow-y: hidden;
+    touch-action: pan-x;
+    scrollbar-width: none;
+  }
+
+  .taskbar-windows::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .start-menu-banner {

@@ -4,6 +4,7 @@ import Window from './Window'
 import Taskbar from './Taskbar'
 import DesktopIcon from './DesktopIcon'
 import type { StartMenuItem } from './StartMenu'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const welcomeWindow: OpenWindowConfig = {
   id: 'welcome',
@@ -77,8 +78,9 @@ const desktopIcons: DesktopIconConfig[] = [
 ]
 
 export default function Desktop({ onShutDown }: { onShutDown: () => void }) {
-  const { windows, openWindow } = useWindowManager()
+  const { windows, activeId, openWindow } = useWindowManager()
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     openWindow(welcomeWindow)
@@ -115,7 +117,9 @@ export default function Desktop({ onShutDown }: { onShutDown: () => void }) {
       </div>
 
       {windows
-        .filter((w) => !w.isMinimized)
+        .filter(
+          (w) => !w.isMinimized && (!isMobile || w.id === activeId),
+        )
         .map((w) => (
           <Window key={w.id} win={w} />
         ))}
