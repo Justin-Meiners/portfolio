@@ -380,6 +380,31 @@ body {
   margin: 0;
 }
 
+.spotify-periods {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.spotify-periods button[aria-pressed='true'] {
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: white;
+  border-bottom-color: white;
+  background-color: #c0c0c0;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 1px,
+      rgba(0, 0, 0, 0.12) 1px,
+      rgba(0, 0, 0, 0.12) 2px
+    );
+  box-shadow: inset 1px 1px #000;
+  font-weight: bold;
+}
+
 .spotify-overview {
   min-height: 230px;
   display: flex;

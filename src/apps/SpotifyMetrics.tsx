@@ -203,25 +203,27 @@ export default function SpotifyMetrics() {
         {metrics && !error && tab === 'recent' && <TrackRows tracks={metrics.recentlyPlayed} recent />}
       </div>
 
-      <fieldset className="spotify-range">
-        <legend>Listening period</legend>
-        {ranges.map((item) => (
-          <label key={item.id}>
-            <input
-              type="radio"
-              name="spotify-range"
-              value={item.id}
-              checked={range === item.id}
-              onChange={() => {
-                setLoading(true)
-                setError(null)
-                setRange(item.id)
-              }}
-            />
+      {tab !== 'overview' && (
+        <fieldset className="spotify-range">
+          <legend>Listening period</legend>
+          <menu className="spotify-periods">
+          {ranges.map((item) => (
+            <button 
+              key={item.id}
+            type="button"
+            aria-pressed={range === item.id}
+            onClick={() => {
+              setLoading(true)
+              setError(null)
+              setRange(item.id)
+            }}
+          >
             {item.label}
-          </label>
+          </button>
         ))}
+        </menu>
       </fieldset>
+      )}
 
       <div className="status-bar">
         <p className="status-bar-field">
