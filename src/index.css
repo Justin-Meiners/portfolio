@@ -356,6 +356,14 @@ body {
   min-width: 72px;
 }
 
+.spotify-tabs button[aria-selected='true'] {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-bottom-color: #fff;
+  font-weight: bold;
+}
+
 .spotify-panel {
   flex: 1;
   min-height: 250px;
@@ -411,6 +419,28 @@ body {
   align-items: center;
   justify-content: center;
   gap: 16px;
+}
+
+.spotify-monthly-featured {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.spotify-monthly-history {
+  margin-top: 8px;
+  border-top: 1px solid #808080;
+}
+
+.spotify-monthly-history h3 {
+  margin: 8px 4px 4px;
+  font-size: inherit;
+}
+
+.spotify-monthly-history .spotify-list li {
+  grid-template-columns: 40px minmax(120px, 1fr) minmax(100px, 0.5fr);
 }
 
 .spotify-artwork,
@@ -545,7 +575,8 @@ body {
     min-height: 0;
   }
 
-  .spotify-overview {
+  .spotify-overview,
+  .spotify-monthly-featured {
     flex-direction: column;
     align-items: center;
     text-align: center;
@@ -561,6 +592,14 @@ body {
 
   .spotify-list-detail {
     grid-column: 3;
+  }
+
+  .spotify-monthly-history .spotify-list li {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .spotify-monthly-history .spotify-list-detail {
+    grid-column: 2;
   }
 
   .spotify-range {

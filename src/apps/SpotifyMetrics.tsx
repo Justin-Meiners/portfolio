@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-type Tab = 'overview' | 'artists' | 'tracks' | 'recent'
+type Tab = 'overview' | 'artists' | 'tracks' | 'recent' | 'monthly'
 type TimeRange = 'short_term' | 'medium_term' | 'long_term'
 
 interface ArtistMetric {
@@ -23,11 +23,16 @@ interface RecentMetric extends TrackMetric {
   playedAt: string
 }
 
+interface MonthlyMetric extends TrackMetric {
+  addedAt: string
+}
+
 interface SpotifyMetricsResponse {
   currentlyPlaying: (TrackMetric & { isPlaying: boolean }) | null
   topArtists: ArtistMetric[]
   topTracks: TrackMetric[]
   recentlyPlayed: RecentMetric[]
+  songOfMonth: MonthlyMetric[]
   updatedAt: string
 }
 
@@ -36,6 +41,7 @@ const tabs: Array<{ id: Tab; label: string }> = [
   { id: 'artists', label: 'Artists' },
   { id: 'tracks', label: 'Tracks' },
   { id: 'recent', label: 'Recent' },
+  { id: 'monthly', label: 'Monthly Pick' },
 ]
 
 const ranges: Array<{ id: TimeRange; label: string }> = [
@@ -45,6 +51,14 @@ const ranges: Array<{ id: TimeRange; label: string }> = [
 ]
 
 const spotifyEndpoint = import.meta.env.VITE_SPOTIFY_METRICS_URL?.replace(/\/$/, '')
+
+function formatMonth(date: string) {
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'America/Chicago',
+  })
+}
 
 function Artwork({ src, alt, size = 40 }: { src: string | null; alt: string; size?: number }) {
   const [failed, setFailed] = useState(false)
@@ -121,6 +135,8 @@ export default function SpotifyMetrics() {
   }, [range, refreshRequest])
 
   const featuredTrack = metrics?.currentlyPlaying ?? metrics?.recentlyPlayed[0] ?? null
+  const currentMonthlySong = metrics?.songOfMonth?.[0] ?? null
+  const previousMonthlySongs = metrics?.songOfMonth?.slice(1) ?? []
 
   return (
     <div className="spotify-app">
@@ -201,9 +217,55 @@ export default function SpotifyMetrics() {
 
         {metrics && !error && tab === 'tracks' && <TrackRows tracks={metrics.topTracks} />}
         {metrics && !error && tab === 'recent' && <TrackRows tracks={metrics.recentlyPlayed} recent />}
+        {metrics && !error && tab === 'monthly' && (
+          <div className="spotify-monthly">
+            {currentMonthlySong ? (
+              <>
+                <section className="spotify-monthly-featured">
+                  <Artwork
+                    src={currentMonthlySong.image}
+                    alt={`Artwork for ${currentMonthlySong.name}`}
+                    size={96}
+                  />
+                  <div className="spotify-featured-copy">
+                    <strong>Song of the Month — {formatMonth(currentMonthlySong.addedAt)}</strong>
+                    <a href={currentMonthlySong.url} target="_blank" rel="noreferrer">
+                      {currentMonthlySong.name}
+                    </a>
+                    <span>{currentMonthlySong.artists.join(', ')}</span>
+                    <span>{currentMonthlySong.album}</span>
+                    <a className="spotify-open-button" href={currentMonthlySong.url} target="_blank" rel="noreferrer">
+                      Open in Spotify
+                    </a>
+                  </div>
+                </section>
+
+                {previousMonthlySongs.length > 0 && (
+                  <section className="spotify-monthly-history">
+                    <h3>Previous selections</h3>
+                    <ol className="spotify-list">
+                      {previousMonthlySongs.map((song) => (
+                        <li key={`${song.id}-${song.addedAt}`}>
+                          <Artwork src={song.image} alt="" />
+                          <span className="spotify-list-copy">
+                            <a href={song.url} target="_blank" rel="noreferrer">{song.name}</a>
+                            <span>{song.artists.join(', ')}</span>
+                          </span>
+                          <span className="spotify-list-detail">{formatMonth(song.addedAt)}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+                )}
+              </>
+            ) : (
+              <div className="spotify-message">No monthly selections were found.</div>
+            )}
+          </div>
+        )}
       </div>
 
-      {tab !== 'overview' && (
+      {(tab === 'artists' || tab === 'tracks') && (
         <fieldset className="spotify-range">
           <legend>Listening period</legend>
           <menu className="spotify-periods">
