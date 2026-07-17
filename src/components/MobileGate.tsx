@@ -15,7 +15,8 @@ export default function MobileGate() {
         </div>
         <div className="window-body">
           <p style={{ marginTop: 0 }}>
-            Turn your phone horizontally if you want a better experience!
+            This portfolio is better viewed on a desktop, but you can still view this on mobile if you wanna check it out.
+            If you ever want the full experience, check back in on a bigger screen!
           </p>
           <div className="mobile-gate-actions">
             <button onClick={() => setEntered(true)}>Enter anyway</button>

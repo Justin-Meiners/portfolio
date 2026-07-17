@@ -63,6 +63,19 @@ const desktopIcons: DesktopIconConfig[] = [
     },
   },
   {
+    id: 'spotify',
+    label: 'My Spotify',
+    icon: '/assets/spotify-icon.png',
+    window: {
+      id: 'spotify',
+      title: 'My Spotify',
+      icon: '/assets/spotify-icon.png',
+      appId: 'spotify',
+      position: { x: 190, y: 80 },
+      width: 560,
+    },
+  },
+  {
     id: 'recycle-bin',
     label: 'Recycle Bin',
     icon: '/assets/recycle-bin-icon.png',

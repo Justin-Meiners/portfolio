@@ -6,7 +6,11 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores([
+    'dist',
+    'spotify-metrics-worker/worker-configuration.d.ts',
+    'spotify-metrics-worker/test',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
