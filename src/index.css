@@ -25,7 +25,8 @@ body {
   position: fixed;
   inset: 0;
   background-color: #008080;
-  overflow: hidden;
+  overflow: auto;
+  scroll-padding-bottom: var(--taskbar-height);
 }
 
 .desktop-window.maximized {
@@ -237,6 +238,10 @@ body {
 @media (max-width: 768px) {
   :root {
     --taskbar-height: 36px;
+  }
+
+  .desktop {
+    overflow: hidden;
   }
 
   .desktop > .desktop-window {
