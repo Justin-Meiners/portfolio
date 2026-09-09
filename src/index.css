@@ -92,7 +92,8 @@ body {
 }
 
 .login-dialog {
-  width: 400px;
+  width: 440px;
+  font-size: 14px;
 }
 
 .login-form {
@@ -110,6 +111,16 @@ body {
   min-width: 0;
 }
 
+.login-message {
+  margin: 0;
+  font-weight: bold;
+}
+
+.login-reminder {
+  margin: 6px 0 12px;
+  line-height: 1.35;
+}
+
 .login-field {
   display: flex;
   align-items: center;
@@ -124,12 +135,20 @@ body {
 .login-field input {
   flex: 1;
   min-width: 0;
+  height: 24px;
+  font-size: 14px;
 }
 
 .login-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.login-actions button {
+  min-width: 72px;
+  min-height: 28px;
+  font-size: 14px;
 }
 
 .desktop-icons {

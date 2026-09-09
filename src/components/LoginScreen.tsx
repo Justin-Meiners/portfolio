@@ -8,7 +8,7 @@ export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
     <div className="login-screen">
       <div className="window login-dialog">
         <div className="title-bar">
-          <div className="title-bar-text">Enter Network Password</div>
+          <div className="title-bar-text">Login</div>
         </div>
         <div className="window-body">
           <form
@@ -26,8 +26,11 @@ export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
               height={48}
             />
             <div className="login-main">
-              <p style={{ marginTop: 0 }}>
-                Type a user name and password to log on to Windows.
+              <p className="login-message">
+                Welcome to my portfolio!
+              </p>
+              <p className="login-reminder">
+                No need for a username/password, just press login!
               </p>
               <div className="login-field">
                 <label htmlFor="login-user">User name:</label>
@@ -44,7 +47,7 @@ export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
               </div>
             </div>
             <div className="login-actions">
-              <button type="submit">OK</button>
+              <button type="submit">Login</button>
               <button type="button" onClick={onLogin}>
                 Cancel
               </button>
