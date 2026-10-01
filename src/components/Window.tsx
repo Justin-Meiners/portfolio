@@ -25,6 +25,9 @@ export default function Window({ win }: { win: WindowState }) {
     position: { x: number; y: number }
   } | null>(null)
   const windowRef = useRef<HTMLDivElement>(null)
+  const autoSizeRef = useRef(win.height === undefined)
+  const initialYRef = useRef(win.position.y)
+  const lastAutoHeightRef = useRef<number | null>(null)
   const dragRef = useRef<{
     startX: number
     startY: number
@@ -35,6 +38,7 @@ export default function Window({ win }: { win: WindowState }) {
     startY: number
     originHeight: number
     originPosition: { x: number; y: number }
+    contentHeight: number
     latest: {
       height: number
       position: { x: number; y: number }
@@ -44,19 +48,48 @@ export default function Window({ win }: { win: WindowState }) {
   const pos = resizeState?.position ?? dragPos ?? win.position
   const height = resizeState?.height ?? win.height
 
-  useLayoutEffect(() => {
-    if (isMobile || win.isMaximized || win.height || !windowRef.current) return
+  function getContentHeight() {
+    const windowElement = windowRef.current
+    const body = windowElement?.querySelector<HTMLElement>('.window-body')
+    if (!windowElement || !body) return 140
 
-    const viewHeight = window.innerHeight / DESKTOP_ZOOM
-    const taskbarHeight = 30
-    const availableHeight = viewHeight - win.position.y - taskbarHeight - 8
-    resizeWindow(win.id, Math.min(windowRef.current.offsetHeight, availableHeight))
-  }, [isMobile, resizeWindow, win.height, win.id, win.isMaximized, win.position.y])
+    const chromeHeight = windowElement.offsetHeight - body.clientHeight
+    return chromeHeight + body.scrollHeight
+  }
+
+  useLayoutEffect(() => {
+    if (isMobile || win.isMaximized || !windowRef.current) return
+
+    const updateHeight = () => {
+      if (!autoSizeRef.current) return
+
+      const viewHeight = window.innerHeight / DESKTOP_ZOOM
+      const taskbarHeight = 30
+      const availableHeight = viewHeight - initialYRef.current - taskbarHeight - 8
+      const nextHeight = Math.min(getContentHeight(), availableHeight)
+
+      if (lastAutoHeightRef.current === nextHeight) return
+      lastAutoHeightRef.current = nextHeight
+      resizeWindow(win.id, nextHeight)
+    }
+
+    updateHeight()
+
+    const body = windowRef.current.querySelector<HTMLElement>('.window-body')
+    if (!body) return
+
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(body)
+    Array.from(body.children).forEach((child) => observer.observe(child))
+
+    return () => observer.disconnect()
+  }, [isMobile, resizeWindow, win.id, win.isMaximized])
 
   function handlePointerDown(e: PointerEvent) {
     if (e.button !== 0) return
     if (isMobile || win.isMaximized) return
     if ((e.target as HTMLElement).closest('.title-bar-controls')) return
+    autoSizeRef.current = false
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -84,12 +117,14 @@ export default function Window({ win }: { win: WindowState }) {
   function handleResizePointerDown(edge: 'top' | 'bottom', e: PointerEvent<HTMLDivElement>) {
     if (e.button !== 0 || !windowRef.current) return
     e.stopPropagation()
+    autoSizeRef.current = false
     focusWindow(win.id)
     resizeRef.current = {
       edge,
       startY: e.clientY,
       originHeight: windowRef.current.offsetHeight,
       originPosition: win.position,
+      contentHeight: getContentHeight(),
       latest: {
         height: windowRef.current.offsetHeight,
         position: win.position,
@@ -108,7 +143,10 @@ export default function Window({ win }: { win: WindowState }) {
     const minimumHeight = 140
 
     if (resize.edge === 'bottom') {
-      const maximumHeight = desktopBottom - resize.originPosition.y
+      const maximumHeight = Math.min(
+        desktopBottom - resize.originPosition.y,
+        resize.contentHeight,
+      )
       const nextHeight = Math.min(Math.max(resize.originHeight + delta, minimumHeight), maximumHeight)
       resize.latest = { height: nextHeight, position: resize.originPosition }
       setResizeState(resize.latest)
@@ -116,7 +154,11 @@ export default function Window({ win }: { win: WindowState }) {
     }
 
     const bottom = resize.originPosition.y + resize.originHeight
-    const nextY = Math.min(Math.max(resize.originPosition.y + delta, 0), bottom - minimumHeight)
+    const minimumY = Math.max(0, bottom - resize.contentHeight)
+    const nextY = Math.min(
+      Math.max(resize.originPosition.y + delta, minimumY),
+      bottom - minimumHeight,
+    )
     resize.latest = {
       height: bottom - nextY,
       position: { x: resize.originPosition.x, y: nextY },
@@ -194,6 +236,7 @@ export default function Window({ win }: { win: WindowState }) {
             aria-label={win.isMaximized ? 'Restore' : 'Maximize'}
             onClick={(e) => {
               e.stopPropagation()
+              autoSizeRef.current = false
               toggleMaximizeWindow(win.id)
             }}
           />

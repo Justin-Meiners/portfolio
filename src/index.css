@@ -12,6 +12,22 @@ body {
 
 body {
   overflow: hidden;
+  font-size: 14px;
+}
+
+button,
+label,
+input,
+legend,
+textarea,
+select,
+option,
+table,
+ul.tree-view,
+.window,
+.title-bar,
+li[role='tab'] {
+  font-size: 13px;
 }
 
 /* Counter-size then zoom so the app scales up but still fills the viewport. */
@@ -55,7 +71,9 @@ body {
 
 .desktop-window > .window-body {
   min-height: 0;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 .desktop-window.maximized {
@@ -200,7 +218,7 @@ body {
 
 .desktop-icon-label {
   color: #fff;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.25;
   text-align: center;
   padding: 0 2px;
@@ -278,7 +296,9 @@ body {
   .desktop > .desktop-window > .window-body {
     flex: 1;
     min-height: 0;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
   }
 
   .desktop-window .title-bar {
@@ -363,7 +383,7 @@ body {
   background: #000080;
   color: #fff;
   padding: 1px 8px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .project-links {
