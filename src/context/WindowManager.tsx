@@ -17,6 +17,7 @@ export interface WindowState {
   icon?: string
   position: { x: number; y: number }
   width?: number
+  height?: number
   zIndex: number
   isMinimized: boolean
   isMaximized: boolean
@@ -30,6 +31,7 @@ export interface OpenWindowConfig {
   icon?: string
   position?: { x: number; y: number }
   width?: number
+  height?: number
 }
 
 interface WindowManagerContextValue {
@@ -42,6 +44,7 @@ interface WindowManagerContextValue {
   toggleMaximizeWindow: (id: string) => void
   toggleWindow: (id: string) => void
   moveWindow: (id: string, position: { x: number; y: number }) => void
+  resizeWindow: (id: string, height: number, position?: { x: number; y: number }) => void
 }
 
 const WindowManagerContext = createContext<WindowManagerContextValue | null>(null)
@@ -86,6 +89,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
           icon: config.icon,
           position: config.position ?? { x: 80, y: 80 },
           width: config.width,
+          height: config.height,
           zIndex: z,
           isMinimized: false,
           isMaximized: false,
@@ -107,6 +111,19 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     (id: string, position: { x: number; y: number }) => {
       setWindows((prev) =>
         prev.map((w) => (w.id === id ? { ...w, position } : w)),
+      )
+    },
+    [],
+  )
+
+  const resizeWindow = useCallback(
+    (id: string, height: number, position?: { x: number; y: number }) => {
+      setWindows((prev) =>
+        prev.map((w) =>
+          w.id === id
+            ? { ...w, height, position: position ?? w.position }
+            : w,
+        ),
       )
     },
     [],
@@ -154,6 +171,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       toggleMaximizeWindow,
       toggleWindow,
       moveWindow,
+      resizeWindow,
     }),
     [
       windows,
@@ -165,6 +183,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       toggleMaximizeWindow,
       toggleWindow,
       moveWindow,
+      resizeWindow,
     ],
   )
 

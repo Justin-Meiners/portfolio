@@ -1,4 +1,4 @@
-import { useRef, useState, type ComponentType, type PointerEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type ComponentType, type PointerEvent } from 'react'
 import { useWindowManager, type WindowState } from '../context/WindowManager'
 import { APP_REGISTRY, type AppParams } from '../apps/registry'
 import { DESKTOP_ZOOM } from '../desktopZoom'
@@ -13,19 +13,45 @@ export default function Window({ win }: { win: WindowState }) {
     minimizeWindow,
     toggleMaximizeWindow,
     moveWindow,
+    resizeWindow,
   } = useWindowManager()
   const isActive = activeId === win.id
   const isMobile = useIsMobile()
   const Body: ComponentType<AppParams> = APP_REGISTRY[win.appId]
 
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null)
+  const [resizeState, setResizeState] = useState<{
+    height: number
+    position: { x: number; y: number }
+  } | null>(null)
+  const windowRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{
     startX: number
     startY: number
     origin: { x: number; y: number }
   } | null>(null)
+  const resizeRef = useRef<{
+    edge: 'top' | 'bottom'
+    startY: number
+    originHeight: number
+    originPosition: { x: number; y: number }
+    latest: {
+      height: number
+      position: { x: number; y: number }
+    }
+  } | null>(null)
 
-  const pos = dragPos ?? win.position
+  const pos = resizeState?.position ?? dragPos ?? win.position
+  const height = resizeState?.height ?? win.height
+
+  useLayoutEffect(() => {
+    if (isMobile || win.isMaximized || win.height || !windowRef.current) return
+
+    const viewHeight = window.innerHeight / DESKTOP_ZOOM
+    const taskbarHeight = 30
+    const availableHeight = viewHeight - win.position.y - taskbarHeight - 8
+    resizeWindow(win.id, Math.min(windowRef.current.offsetHeight, availableHeight))
+  }, [isMobile, resizeWindow, win.height, win.id, win.isMaximized, win.position.y])
 
   function handlePointerDown(e: PointerEvent) {
     if (e.button !== 0) return
@@ -49,9 +75,62 @@ export default function Window({ win }: { win: WindowState }) {
     // Prevent window from being dragged out of view
     const viewW = window.innerWidth / DESKTOP_ZOOM
     const viewH = window.innerHeight / DESKTOP_ZOOM
+    const windowHeight = height ?? windowRef.current?.offsetHeight ?? 140
     const x = Math.min(Math.max(nextX, -(width - 120)), viewW - 120)
-    const y = Math.min(Math.max(nextY, 0), viewH - 40)
+    const y = Math.min(Math.max(nextY, 0), viewH - 30 - windowHeight - 8)
     setDragPos({ x, y })
+  }
+
+  function handleResizePointerDown(edge: 'top' | 'bottom', e: PointerEvent<HTMLDivElement>) {
+    if (e.button !== 0 || !windowRef.current) return
+    e.stopPropagation()
+    focusWindow(win.id)
+    resizeRef.current = {
+      edge,
+      startY: e.clientY,
+      originHeight: windowRef.current.offsetHeight,
+      originPosition: win.position,
+      latest: {
+        height: windowRef.current.offsetHeight,
+        position: win.position,
+      },
+    }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+
+  function handleResizePointerMove(e: PointerEvent<HTMLDivElement>) {
+    const resize = resizeRef.current
+    if (!resize) return
+
+    const delta = (e.clientY - resize.startY) / DESKTOP_ZOOM
+    const viewHeight = window.innerHeight / DESKTOP_ZOOM
+    const desktopBottom = viewHeight - 30 - 8
+    const minimumHeight = 140
+
+    if (resize.edge === 'bottom') {
+      const maximumHeight = desktopBottom - resize.originPosition.y
+      const nextHeight = Math.min(Math.max(resize.originHeight + delta, minimumHeight), maximumHeight)
+      resize.latest = { height: nextHeight, position: resize.originPosition }
+      setResizeState(resize.latest)
+      return
+    }
+
+    const bottom = resize.originPosition.y + resize.originHeight
+    const nextY = Math.min(Math.max(resize.originPosition.y + delta, 0), bottom - minimumHeight)
+    resize.latest = {
+      height: bottom - nextY,
+      position: { x: resize.originPosition.x, y: nextY },
+    }
+    setResizeState(resize.latest)
+  }
+
+  function handleResizePointerUp(e: PointerEvent<HTMLDivElement>) {
+    const resize = resizeRef.current
+    if (!resize) return
+    resizeRef.current = null
+    e.currentTarget.releasePointerCapture(e.pointerId)
+    resizeWindow(win.id, resize.latest.height, resize.latest.position)
+    setResizeState(null)
   }
 
   function handlePointerUp(e: PointerEvent) {
@@ -66,6 +145,7 @@ export default function Window({ win }: { win: WindowState }) {
 
   return (
     <div
+      ref={windowRef}
       className={`window desktop-window${win.isMaximized ? ' maximized' : ''}`}
       onMouseDown={() => focusWindow(win.id)}
       style={{
@@ -74,9 +154,20 @@ export default function Window({ win }: { win: WindowState }) {
         top: win.isMaximized ? 0 : pos.y,
         zIndex: win.zIndex,
         width: win.isMaximized ? '100%' : (win.width ?? 320),
-        height: win.isMaximized ? 'calc(100% - var(--taskbar-height))' : undefined,
+        height: win.isMaximized ? 'calc(100% - var(--taskbar-height))' : height,
+        maxHeight: !win.isMaximized && !height
+          ? `calc(100% - ${win.position.y}px - var(--taskbar-height) - 8px)`
+          : undefined,
       }}
     >
+      {!isMobile && !win.isMaximized && (
+        <div
+          className="window-resize-edge top"
+          onPointerDown={(e) => handleResizePointerDown('top', e)}
+          onPointerMove={handleResizePointerMove}
+          onPointerUp={handleResizePointerUp}
+        />
+      )}
       <div
         className={`title-bar${isActive ? '' : ' inactive'}`}
         style={{
@@ -118,6 +209,14 @@ export default function Window({ win }: { win: WindowState }) {
       <div className="window-body">
         <Body {...win.params} />
       </div>
+      {!isMobile && !win.isMaximized && (
+        <div
+          className="window-resize-edge bottom"
+          onPointerDown={(e) => handleResizePointerDown('bottom', e)}
+          onPointerMove={handleResizePointerMove}
+          onPointerUp={handleResizePointerUp}
+        />
+      )}
     </div>
   )
 }
